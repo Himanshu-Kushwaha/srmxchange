@@ -8,32 +8,27 @@ from django.http import HttpRequest
 from django.http import JsonResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
-from django.core.urlresolvers import reverse
-from . import models
 from . import utils
 
 
 def home(request):
     """Renders the home page."""
     assert isinstance(request, HttpRequest)
+    if 'route' in request.session:
+        context = {'route': request.session['route']}
+        del request.session['route']
+    else:
+        context = {'route': None}
     return render(
         request,
-        'app/index.html'
+        'app/index.html',
+        context=context
     )
 
 
 def redirect_to_home(request, route):
     request.session['route'] = route
-    print('set here ', request.session['route'])
     return redirect('/app/')
-
-
-def get_route(request):
-    if 'route' in request.session:
-        print(request.session['route'])
-        return JsonResponse({'route': request.session['route']})
-    else:
-        raise Http404
 
 
 def logout(request):
